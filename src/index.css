@@ -87,6 +87,46 @@
     box-shadow: 2px 2px 0px hsl(var(--pixel-red));
   }
 
+  .btn-green {
+    background-color: #166534;
+    color: #bef264;
+    border: 2px solid #bef264;
+    box-shadow: 4px 4px 0px #bef264;
+    transition: all 0.15s;
+    padding: 0.5rem 1rem;
+    text-transform: uppercase;
+  }
+
+  .btn-green:hover {
+    transform: translate(-4px, -4px);
+    box-shadow: 6px 6px 0px #bef264;
+  }
+
+  .btn-green:active {
+    transform: translate(0px, 0px);
+    box-shadow: 2px 2px 0px #bef264;
+  }
+
+  .item-card {
+    display: flex;
+    flex-direction: column;
+    transition: all 0.2s;
+    position: relative;
+    background: linear-gradient(145deg, #1f2c4c, #131a2e);
+    border: 2px solid #0f3460;
+    box-shadow: 0px 4px 0px #0b121f, 0px 6px 8px rgba(0,0,0,0.4);
+  }
+
+  .item-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0px 6px 0px #0b121f, 0px 8px 12px rgba(0,0,0,0.5);
+  }
+
+  .item-card img {
+    image-rendering: pixelated;
+    border-bottom: 4px solid #0b121f;
+  }
+
   .task-checkbox {
     @apply appearance-none w-10 h-10 bg-gray-700 cursor-pointer transition-all duration-100 flex-shrink-0 relative;
     border: 2px solid #000;
