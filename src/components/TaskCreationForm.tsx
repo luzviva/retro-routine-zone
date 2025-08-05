@@ -10,6 +10,10 @@ interface TaskFormData {
   dateEnd?: string;
   weekdays?: string[];
   specificDate?: string;
+  timeStart?: string;
+  timeEnd?: string;
+  timeMode: 'start-end' | 'start-duration';
+  duration?: number; // em minutos
 }
 
 interface TaskCreationFormProps {
@@ -26,6 +30,10 @@ export const TaskCreationForm = ({ onSubmit }: TaskCreationFormProps) => {
     dateStart: '',
     dateEnd: '',
     weekdays: ['mon', 'tue', 'wed', 'thu', 'fri'],
+    timeStart: '08:00',
+    timeEnd: '08:10',
+    timeMode: 'start-end',
+    duration: 10,
   });
 
   const updateFrequencyFields = (frequency: string) => {
@@ -93,6 +101,91 @@ export const TaskCreationForm = ({ onSubmit }: TaskCreationFormProps) => {
             </select>
           </div>
         </div>
+        
+        {/* Configuração de Horários */}
+        <div className="space-y-4 border-t border-gray-600 pt-4">
+          <h3 className="text-xl text-cyan-400">Horário da Tarefa</h3>
+          <div>
+            <label className="text-lg block mb-2">Configuração de Tempo</label>
+            <div className="flex gap-4 mb-4">
+              <label className="flex items-center gap-2 text-lg cursor-pointer">
+                <input 
+                  type="radio" 
+                  name="time-mode" 
+                  value="start-end" 
+                  className="nes-radio"
+                  checked={formData.timeMode === 'start-end'}
+                  onChange={(e) => setFormData(prev => ({ ...prev, timeMode: e.target.value as any }))}
+                />
+                Início e Fim
+              </label>
+              <label className="flex items-center gap-2 text-lg cursor-pointer">
+                <input 
+                  type="radio" 
+                  name="time-mode" 
+                  value="start-duration" 
+                  className="nes-radio"
+                  checked={formData.timeMode === 'start-duration'}
+                  onChange={(e) => setFormData(prev => ({ ...prev, timeMode: e.target.value as any }))}
+                />
+                Início e Duração
+              </label>
+            </div>
+          </div>
+          
+          {formData.timeMode === 'start-end' && (
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="time-start" className="block mb-1">Horário de Início</label>
+                <input 
+                  type="time" 
+                  id="time-start" 
+                  className="nes-input"
+                  value={formData.timeStart || ''}
+                  onChange={(e) => setFormData(prev => ({ ...prev, timeStart: e.target.value }))}
+                />
+              </div>
+              <div>
+                <label htmlFor="time-end" className="block mb-1">Horário de Fim</label>
+                <input 
+                  type="time" 
+                  id="time-end" 
+                  className="nes-input"
+                  value={formData.timeEnd || ''}
+                  onChange={(e) => setFormData(prev => ({ ...prev, timeEnd: e.target.value }))}
+                />
+              </div>
+            </div>
+          )}
+          
+          {formData.timeMode === 'start-duration' && (
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="time-start-duration" className="block mb-1">Horário de Início</label>
+                <input 
+                  type="time" 
+                  id="time-start-duration" 
+                  className="nes-input"
+                  value={formData.timeStart || ''}
+                  onChange={(e) => setFormData(prev => ({ ...prev, timeStart: e.target.value }))}
+                />
+              </div>
+              <div>
+                <label htmlFor="duration" className="block mb-1">Duração (minutos)</label>
+                <input 
+                  type="number" 
+                  id="duration" 
+                  className="nes-input"
+                  min="1"
+                  max="1440"
+                  value={formData.duration || ''}
+                  onChange={(e) => setFormData(prev => ({ ...prev, duration: parseInt(e.target.value) }))}
+                />
+              </div>
+            </div>
+          )}
+        </div>
+
         <div>
           <label htmlFor="task-frequency" className="text-lg block mb-1">Frequência</label>
           <select 
