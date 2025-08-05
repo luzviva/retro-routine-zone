@@ -14,6 +14,126 @@ export type Database = {
   }
   public: {
     Tables: {
+      achievements: {
+        Row: {
+          category: string | null
+          created_at: string
+          description: string | null
+          icon_url: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          points_required: number
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          icon_url?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          points_required?: number
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          icon_url?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          points_required?: number
+        }
+        Relationships: []
+      }
+      avatar_customizations: {
+        Row: {
+          accessory: string | null
+          background: string | null
+          created_at: string
+          hair_color: string | null
+          hair_style: string | null
+          id: string
+          outfit: string | null
+          skin_tone: string | null
+          unlocked_items: Json | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          accessory?: string | null
+          background?: string | null
+          created_at?: string
+          hair_color?: string | null
+          hair_style?: string | null
+          id?: string
+          outfit?: string | null
+          skin_tone?: string | null
+          unlocked_items?: Json | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          accessory?: string | null
+          background?: string | null
+          created_at?: string
+          hair_color?: string | null
+          hair_style?: string | null
+          id?: string
+          outfit?: string | null
+          skin_tone?: string | null
+          unlocked_items?: Json | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      child_settings: {
+        Row: {
+          bedtime: string | null
+          created_at: string
+          daily_screen_time_limit: number | null
+          difficulty_level: string | null
+          id: string
+          notifications_enabled: boolean | null
+          parent_approval_required: boolean | null
+          rewards_enabled: boolean | null
+          updated_at: string
+          user_id: string
+          wakeup_time: string | null
+          weekly_allowance: number | null
+        }
+        Insert: {
+          bedtime?: string | null
+          created_at?: string
+          daily_screen_time_limit?: number | null
+          difficulty_level?: string | null
+          id?: string
+          notifications_enabled?: boolean | null
+          parent_approval_required?: boolean | null
+          rewards_enabled?: boolean | null
+          updated_at?: string
+          user_id: string
+          wakeup_time?: string | null
+          weekly_allowance?: number | null
+        }
+        Update: {
+          bedtime?: string | null
+          created_at?: string
+          daily_screen_time_limit?: number | null
+          difficulty_level?: string | null
+          id?: string
+          notifications_enabled?: boolean | null
+          parent_approval_required?: boolean | null
+          rewards_enabled?: boolean | null
+          updated_at?: string
+          user_id?: string
+          wakeup_time?: string | null
+          weekly_allowance?: number | null
+        }
+        Relationships: []
+      }
       families: {
         Row: {
           created_at: string
@@ -69,26 +189,44 @@ export type Database = {
       }
       profiles: {
         Row: {
+          avatar_url: string | null
+          birth_date: string | null
           created_at: string
+          current_level: number | null
           display_name: string | null
+          favorite_color: string | null
           id: string
+          is_child: boolean | null
           parent_pin: string | null
+          total_experience: number | null
           updated_at: string
           user_id: string
         }
         Insert: {
+          avatar_url?: string | null
+          birth_date?: string | null
           created_at?: string
+          current_level?: number | null
           display_name?: string | null
+          favorite_color?: string | null
           id?: string
+          is_child?: boolean | null
           parent_pin?: string | null
+          total_experience?: number | null
           updated_at?: string
           user_id: string
         }
         Update: {
+          avatar_url?: string | null
+          birth_date?: string | null
           created_at?: string
+          current_level?: number | null
           display_name?: string | null
+          favorite_color?: string | null
           id?: string
+          is_child?: boolean | null
           parent_pin?: string | null
+          total_experience?: number | null
           updated_at?: string
           user_id?: string
         }
@@ -143,6 +281,35 @@ export type Database = {
             columns: ["family_id"]
             isOneToOne: false
             referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_achievements: {
+        Row: {
+          achievement_id: string
+          earned_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          achievement_id: string
+          earned_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          achievement_id?: string
+          earned_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_achievements_achievement_id_fkey"
+            columns: ["achievement_id"]
+            isOneToOne: false
+            referencedRelation: "achievements"
             referencedColumns: ["id"]
           },
         ]
