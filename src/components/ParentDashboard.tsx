@@ -49,7 +49,7 @@ export const ParentDashboard = ({ onLogout }: ParentDashboardProps) => {
               Criar Tarefa
             </button>
           </DialogTrigger>
-          <DialogContent className="max-w-2xl">
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Criar Nova Tarefa</DialogTitle>
             </DialogHeader>
