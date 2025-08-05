@@ -8,7 +8,6 @@ import { QuestCard } from "../components/QuestCard";
 import { WeekView } from "../components/WeekView";
 import { FeedbackModal } from "../components/FeedbackModal";
 import { SpecialMission } from "../components/SpecialMission";
-import { Store } from "../components/Store";
 import { Settings, ShoppingCart } from "lucide-react";
 
 interface Task {
@@ -44,7 +43,6 @@ const Home = () => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date(2025, 7, 5));
   const [isToday, setIsToday] = useState(true);
   const [isVisible, setIsVisible] = useState(false);
-  const [showStore, setShowStore] = useState(false);
 
   const dayNames = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado"];
   const dayTitleNames = ["DOMINGO", "SEGUNDA", "TERÇA", "QUARTA", "QUINTA", "SEXTA", "SÁBADO"];
@@ -103,11 +101,7 @@ const Home = () => {
   };
 
   const handleStoreClick = () => {
-    setShowStore(true);
-  };
-
-  const handleStoreClose = () => {
-    setShowStore(false);
+    navigate('/loja');
   };
 
   const formatDate = () => {
@@ -205,14 +199,6 @@ const Home = () => {
         isVisible={showFeedback}
         onClose={() => setShowFeedback(false)}
       />
-
-      {/* Store Modal */}
-      {showStore && (
-        <Store 
-          coinBalance={coinBalance}
-          onClose={handleStoreClose}
-        />
-      )}
     </div>
   );
 };

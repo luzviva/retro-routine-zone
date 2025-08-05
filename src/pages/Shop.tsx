@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { CoinIcon } from "./CoinIcon";
+import { useNavigate } from "react-router-dom";
+import { CoinIcon } from "../components/CoinIcon";
 
 interface StoreItem {
   id: number;
@@ -8,11 +9,6 @@ interface StoreItem {
   cost: number;
   image: string;
   canAfford: boolean;
-}
-
-interface StoreProps {
-  coinBalance: number;
-  onClose: () => void;
 }
 
 interface ConfirmPurchaseModalProps {
@@ -54,9 +50,11 @@ const ConfirmPurchaseModal = ({ item, isVisible, onClose, onConfirm }: ConfirmPu
   );
 };
 
-export const Store = ({ coinBalance, onClose }: StoreProps) => {
+const Shop = () => {
+  const navigate = useNavigate();
   const [selectedItem, setSelectedItem] = useState<StoreItem | null>(null);
   const [showModal, setShowModal] = useState(false);
+  const coinBalance = 125; // This should come from props or context in a real app
 
   const storeItems: StoreItem[] = [
     {
@@ -111,62 +109,62 @@ export const Store = ({ coinBalance, onClose }: StoreProps) => {
     setSelectedItem(null);
   };
 
-  return (
-    <>
-      <div className="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-40">
-        <div className="w-full max-w-6xl max-h-[90vh] overflow-y-auto">
-          <div id="store-view" className="mx-auto">
-            {/* CABEÇALHO DA LOJA */}
-            <header className="pixel-border p-4 mb-8 flex flex-col md:flex-row justify-between items-center gap-4">
-              <h2 className="text-4xl text-yellow-400">LOJA DE RECOMPENSAS</h2>
-              <div className="flex items-center gap-6">
-                <div className="flex items-center gap-2 text-3xl text-yellow-400">
-                  <CoinIcon className="w-8 h-8" />
-                  <span>{coinBalance}</span>
-                </div>
-                <button className="pixel-btn text-lg" onClick={onClose}>
-                  Tarefas
-                </button>
-              </div>
-            </header>
+  const handleBackToTasks = () => {
+    navigate('/');
+  };
 
-            {/* LOJA */}
-            <main>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                {storeItems.map(item => (
-                  <div 
-                    key={item.id} 
-                    className={`item-card ${!item.canAfford ? 'opacity-70' : ''}`}
-                  >
-                    <img 
-                      src={item.image} 
-                      alt={item.name} 
-                      className="w-full h-40 object-cover" 
-                      style={{ imageRendering: 'pixelated' }}
-                    />
-                    <div className="p-4 flex flex-col flex-grow">
-                      <h3 className="text-2xl text-yellow-400 mb-2">{item.name}</h3>
-                      <p className="text-cyan-400/80 mb-4 flex-grow text-base">{item.description}</p>
-                      <div className="flex justify-between items-center mt-auto">
-                        <span className="text-2xl text-yellow-400 flex items-center gap-2">
-                          <CoinIcon />
-                          {item.cost}
-                        </span>
-                        <button 
-                          className={item.canAfford ? "btn-green" : "btn-disabled"} 
-                          disabled={!item.canAfford}
-                          onClick={() => handlePurchaseClick(item)}
-                        >
-                          Comprar
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </main>
+  return (
+    <div className="p-4 md:p-8">
+      <div className="max-w-6xl mx-auto">
+        {/* CABEÇALHO DA LOJA */}
+        <header className="pixel-border p-4 mb-8 flex flex-col md:flex-row justify-between items-center gap-4">
+          <h2 className="text-4xl text-yellow-400">LOJA DE RECOMPENSAS</h2>
+          <div className="flex items-center gap-6">
+            <div className="flex items-center gap-2 text-3xl text-yellow-400">
+              <CoinIcon className="w-8 h-8" />
+              <span>{coinBalance}</span>
+            </div>
+            <button className="pixel-btn text-lg" onClick={handleBackToTasks}>
+              Tarefas
+            </button>
           </div>
-        </div>
+        </header>
+
+        {/* LOJA */}
+        <main>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {storeItems.map(item => (
+              <div 
+                key={item.id} 
+                className={`item-card ${!item.canAfford ? 'opacity-70' : ''}`}
+              >
+                <img 
+                  src={item.image} 
+                  alt={item.name} 
+                  className="w-full h-40 object-cover" 
+                  style={{ imageRendering: 'pixelated' }}
+                />
+                <div className="p-4 flex flex-col flex-grow">
+                  <h3 className="text-2xl text-yellow-400 mb-2">{item.name}</h3>
+                  <p className="text-cyan-400/80 mb-4 flex-grow text-base">{item.description}</p>
+                  <div className="flex justify-between items-center mt-auto">
+                    <span className="text-2xl text-yellow-400 flex items-center gap-2">
+                      <CoinIcon />
+                      {item.cost}
+                    </span>
+                    <button 
+                      className={item.canAfford ? "btn-green" : "btn-disabled"} 
+                      disabled={!item.canAfford}
+                      onClick={() => handlePurchaseClick(item)}
+                    >
+                      Comprar
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </main>
       </div>
 
       <ConfirmPurchaseModal 
@@ -175,6 +173,8 @@ export const Store = ({ coinBalance, onClose }: StoreProps) => {
         onClose={handleCloseModal}
         onConfirm={handleConfirmPurchase}
       />
-    </>
+    </div>
   );
 };
+
+export default Shop;
