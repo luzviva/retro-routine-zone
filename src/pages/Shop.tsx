@@ -54,7 +54,7 @@ const Shop = () => {
   const navigate = useNavigate();
   const [selectedItem, setSelectedItem] = useState<StoreItem | null>(null);
   const [showModal, setShowModal] = useState(false);
-  const [coinBalance, setCoinBalance] = useState(125);
+  const coinBalance = 125; // This should come from props or context in a real app
 
   const storeItems: StoreItem[] = [
     {
@@ -99,11 +99,9 @@ const Shop = () => {
   };
 
   const handleConfirmPurchase = () => {
-    if (selectedItem) {
-      setCoinBalance(prevBalance => prevBalance - selectedItem.cost);
-    }
     setShowModal(false);
     setSelectedItem(null);
+    // Aqui implementaria a lógica de compra
   };
 
   const handleCloseModal = () => {
