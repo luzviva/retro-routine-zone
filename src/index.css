@@ -236,6 +236,22 @@
     background-size: 1em;
     padding-right: 2rem;
   }
+
+  /* Radio button styles */
+  .nes-radio {
+    @apply appearance-none w-6 h-6 border-4 rounded-full cursor-pointer relative;
+    border-color: hsl(var(--pixel-cyan));
+    background-color: rgb(31 41 55);
+  }
+
+  .nes-radio:checked::after {
+    content: '';
+    @apply block w-3 h-3 rounded-full absolute;
+    background-color: hsl(var(--pixel-yellow));
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
 }
 
 @layer base {

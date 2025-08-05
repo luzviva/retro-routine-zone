@@ -1,5 +1,6 @@
 import { TaskCreationForm } from "./TaskCreationForm";
 import { StoreItemCreationForm } from "./StoreItemCreationForm";
+import { SpecialMissionCreationForm } from "./SpecialMissionCreationForm";
 
 interface ParentDashboardProps {
   onLogout: () => void;
@@ -16,6 +17,11 @@ export const ParentDashboard = ({ onLogout }: ParentDashboardProps) => {
     // Aqui implementaria a lógica para salvar o item da loja
   };
 
+  const handleSpecialMissionSubmit = (data: any) => {
+    console.log('Nova missão especial:', data);
+    // Aqui implementaria a lógica para salvar a missão especial
+  };
+
   return (
     <div>
       <header className="pixel-border p-4 mb-8 flex justify-between items-center">
@@ -29,12 +35,17 @@ export const ParentDashboard = ({ onLogout }: ParentDashboardProps) => {
         </button>
       </header>
 
-      <main className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Formulário de Criar Tarefa */}
-        <TaskCreationForm onSubmit={handleTaskSubmit} />
+      <main>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Formulário de Criar Tarefa */}
+          <TaskCreationForm onSubmit={handleTaskSubmit} />
 
-        {/* Formulário de Criar Item da Loja */}
-        <StoreItemCreationForm onSubmit={handleStoreItemSubmit} />
+          {/* Formulário de Criar Item da Loja */}
+          <StoreItemCreationForm onSubmit={handleStoreItemSubmit} />
+        </div>
+
+        {/* Formulário de Criar Missão Especial */}
+        <SpecialMissionCreationForm onSubmit={handleSpecialMissionSubmit} />
       </main>
     </div>
   );
