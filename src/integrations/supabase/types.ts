@@ -354,7 +354,16 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_user_families: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          family_id: string
+        }[]
+      }
+      is_user_parent_in_family: {
+        Args: { check_family_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never
