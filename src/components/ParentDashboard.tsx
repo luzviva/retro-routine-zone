@@ -1,12 +1,14 @@
 import { TaskCreationForm } from "./TaskCreationForm";
 import { StoreItemCreationForm } from "./StoreItemCreationForm";
 import { SpecialMissionCreationForm } from "./SpecialMissionCreationForm";
+import { useNavigate } from "react-router-dom";
 
 interface ParentDashboardProps {
   onLogout: () => void;
 }
 
 export const ParentDashboard = ({ onLogout }: ParentDashboardProps) => {
+  const navigate = useNavigate();
   const handleTaskSubmit = (data: any) => {
     console.log('Nova tarefa:', data);
     // Aqui implementaria a lógica para salvar a tarefa
@@ -26,13 +28,22 @@ export const ParentDashboard = ({ onLogout }: ParentDashboardProps) => {
     <div>
       <header className="pixel-border p-4 mb-8 flex justify-between items-center">
         <h1 className="text-3xl text-cyan-400">Painel dos Pais</h1>
-        <button 
-          onClick={onLogout} 
-          className="pixel-btn text-yellow-400" 
-          style={{ borderColor: 'hsl(var(--pixel-yellow))', color: 'hsl(var(--pixel-yellow))' }}
-        >
-          Sair
-        </button>
+        <div className="flex gap-4">
+          <button 
+            onClick={() => navigate('/novoperfil')} 
+            className="pixel-btn text-green-400" 
+            style={{ borderColor: 'hsl(var(--pixel-green))', color: 'hsl(var(--pixel-green))' }}
+          >
+            Criar Perfil
+          </button>
+          <button 
+            onClick={onLogout} 
+            className="pixel-btn text-yellow-400" 
+            style={{ borderColor: 'hsl(var(--pixel-yellow))', color: 'hsl(var(--pixel-yellow))' }}
+          >
+            Sair
+          </button>
+        </div>
       </header>
 
       <main>
