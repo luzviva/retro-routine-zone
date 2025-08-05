@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 
 interface StoreItemFormData {
   name: string;
@@ -6,6 +7,8 @@ interface StoreItemFormData {
   cost: number;
   stock?: number;
   image?: File;
+  imageUrl?: string;
+  imageType: 'file' | 'camera' | 'url';
 }
 
 interface StoreItemCreationFormProps {
@@ -18,7 +21,66 @@ export const StoreItemCreationForm = ({ onSubmit }: StoreItemCreationFormProps) 
     description: 'Vamos pedir uma pizza grande do sabor que você escolher!',
     cost: 300,
     stock: undefined,
+    imageType: 'file',
   });
+
+  const [imagePreview, setImagePreview] = useState<string>('');
+
+  const takePicture = async () => {
+    try {
+      const image = await Camera.getPhoto({
+        quality: 90,
+        allowEditing: true,
+        resultType: CameraResultType.DataUrl,
+        source: CameraSource.Camera,
+      });
+
+      if (image.dataUrl) {
+        setImagePreview(image.dataUrl);
+        setFormData(prev => ({ ...prev, imageUrl: image.dataUrl, imageType: 'camera' }));
+      }
+    } catch (error) {
+      console.error('Erro ao tirar foto:', error);
+    }
+  };
+
+  const selectFromGallery = async () => {
+    try {
+      const image = await Camera.getPhoto({
+        quality: 90,
+        allowEditing: true,
+        resultType: CameraResultType.DataUrl,
+        source: CameraSource.Photos,
+      });
+
+      if (image.dataUrl) {
+        setImagePreview(image.dataUrl);
+        setFormData(prev => ({ ...prev, imageUrl: image.dataUrl, imageType: 'camera' }));
+      }
+    } catch (error) {
+      console.error('Erro ao selecionar foto:', error);
+    }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+      setFormData(prev => ({ ...prev, image: file, imageType: 'file' }));
+    }
+  };
+
+  const handleUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const url = e.target.value;
+    setFormData(prev => ({ ...prev, imageUrl: url, imageType: 'url' }));
+    if (url) {
+      setImagePreview(url);
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -71,15 +133,72 @@ export const StoreItemCreationForm = ({ onSubmit }: StoreItemCreationFormProps) 
             />
           </div>
         </div>
-        <div>
-          <label htmlFor="item-image" className="text-lg block mb-1">Imagem do Item</label>
-          <input 
-            type="file" 
-            id="item-image" 
-            className="nes-input"
-            onChange={(e) => setFormData(prev => ({ ...prev, image: e.target.files?.[0] }))}
-          />
+        
+        {/* Seção de Imagem */}
+        <div className="space-y-4 border-t border-gray-600 pt-4">
+          <h3 className="text-xl text-cyan-400">Imagem do Item</h3>
+          
+          {/* Opções de imagem */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <button
+                type="button"
+                onClick={takePicture}
+                className="pixel-btn w-full text-blue-400"
+                style={{ borderColor: 'hsl(var(--pixel-blue))', color: 'hsl(var(--pixel-blue))' }}
+              >
+                📷 Tirar Foto
+              </button>
+              
+              <button
+                type="button"
+                onClick={selectFromGallery}
+                className="pixel-btn w-full text-purple-400"
+                style={{ borderColor: 'hsl(var(--pixel-purple))', color: 'hsl(var(--pixel-purple))' }}
+              >
+                🖼️ Escolher da Galeria
+              </button>
+            </div>
+            
+            <div className="space-y-2">
+              <div>
+                <label htmlFor="item-file" className="block mb-1 text-sm">Ou escolher arquivo:</label>
+                <input 
+                  type="file" 
+                  id="item-file" 
+                  className="nes-input text-sm"
+                  accept="image/*"
+                  onChange={handleFileChange}
+                />
+              </div>
+              
+              <div>
+                <label htmlFor="item-url" className="block mb-1 text-sm">Ou usar URL:</label>
+                <input 
+                  type="url" 
+                  id="item-url" 
+                  className="nes-input text-sm"
+                  placeholder="https://exemplo.com/imagem.jpg"
+                  value={formData.imageUrl || ''}
+                  onChange={handleUrlChange}
+                />
+              </div>
+            </div>
+          </div>
+          
+          {/* Preview da imagem */}
+          {imagePreview && (
+            <div className="border-2 border-gray-600 p-4">
+              <h4 className="text-lg mb-2">Preview:</h4>
+              <img 
+                src={imagePreview} 
+                alt="Preview do item" 
+                className="max-w-full h-32 object-cover border-2 border-white"
+              />
+            </div>
+          )}
         </div>
+
         <div className="pt-4">
           <button type="submit" className="pixel-btn w-full text-green-400" style={{ borderColor: 'hsl(var(--pixel-green))', color: 'hsl(var(--pixel-green))' }}>
             Salvar Item
