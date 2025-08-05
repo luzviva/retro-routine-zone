@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { User, Session } from "@supabase/supabase-js";
 import { PixelAvatar } from "../components/PixelAvatar";
 import { CoinIcon } from "../components/CoinIcon";
 import { ProgressBar } from "../components/ProgressBar";
@@ -20,6 +22,8 @@ interface Task {
 
 const Home = () => {
   const navigate = useNavigate();
+  const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
   const [coinBalance, setCoinBalance] = useState(125);
   const [tasks, setTasks] = useState<Task[]>([
     {
@@ -52,9 +56,35 @@ const Home = () => {
   const totalTasks = tasks.length;
 
   useEffect(() => {
+    // Set up auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        setSession(session);
+        setUser(session?.user ?? null);
+        
+        // If no user, redirect to auth
+        if (!session?.user) {
+          navigate('/auth');
+        }
+      }
+    );
+
+    // Check for existing session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      
+      // If no user, redirect to auth
+      if (!session?.user) {
+        navigate('/auth');
+      }
+    });
+
     // Animação de entrada
     setTimeout(() => setIsVisible(true), 100);
-  }, []);
+
+    return () => subscription.unsubscribe();
+  }, [navigate]);
 
   const showFeedbackMessage = (message: string) => {
     setFeedbackMessage(message);
