@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { PixelAvatar } from "../components/PixelAvatar";
 import { CoinIcon } from "../components/CoinIcon";
 import { ProgressBar } from "../components/ProgressBar";
@@ -18,6 +19,7 @@ interface Task {
 }
 
 const Home = () => {
+  const navigate = useNavigate();
   const [coinBalance, setCoinBalance] = useState(125);
   const [tasks, setTasks] = useState<Task[]>([
     {
@@ -94,6 +96,10 @@ const Home = () => {
     showFeedbackMessage(`PRÊMIO! +${prizeAmount} Moedas!`);
   };
 
+  const handleSettingsClick = () => {
+    navigate('/settings');
+  };
+
   const formatDate = () => {
     const dayIndex = selectedDate.getDay();
     return `${dayNames[dayIndex]}, ${selectedDate.getDate()} de ${monthNames[selectedDate.getMonth()]} de ${selectedDate.getFullYear()}`;
@@ -143,6 +149,7 @@ const Home = () => {
             <PixelButton 
               className="text-sm p-2 flex items-center"
               aria-label="Configurações"
+              onClick={handleSettingsClick}
             >
               <Settings className="w-6 h-6" />
             </PixelButton>

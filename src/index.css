@@ -204,6 +204,38 @@
     transform: translateY(20px);
     transition: opacity 0.5s ease-out, transform 0.5s ease-out;
   }
+
+  /* Estilos específicos para o painel de configurações */
+  .btn-disabled {
+    @apply px-6 py-2 text-lg uppercase;
+    background-color: #535353;
+    color: #9a9a9a;
+    border: 2px solid #9a9a9a;
+    box-shadow: 4px 4px 0px #9a9a9a;
+    cursor: not-allowed;
+  }
+
+  /* Estilo para caixas de texto e seletores */
+  .nes-input {
+    @apply w-full border-4 border-cyan-400 p-2 text-white text-lg focus:outline-none focus:border-yellow-400;
+    background-color: rgba(0, 0, 0, 0.4);
+    color-scheme: dark;
+  }
+
+  /* Estilo para o ícone do calendário em inputs de data (Chrome/Edge) */
+  .nes-input::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+  }
+
+  .nes-select {
+    @apply w-full border-4 border-cyan-400 p-2 text-white text-lg focus:outline-none focus:border-yellow-400 appearance-none;
+    background-color: rgba(0, 0, 0, 0.4);
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="%2300ffff"><polygon points="0,0 20,0 10,10"/></svg>');
+    background-position: right 0.5rem center;
+    background-repeat: no-repeat;
+    background-size: 1em;
+    padding-right: 2rem;
+  }
 }
 
 @layer base {
