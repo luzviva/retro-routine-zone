@@ -138,10 +138,16 @@ const NovoPerfil = () => {
         return;
       }
 
-      // Get avatar URL from canvas if drawing mode
+      // Get avatar URL - use drawing canvas only for custom drawings
       let avatarUrl = selectedAvatar;
-      if (avatarMode === 'draw' && previewCanvasRef.current) {
-        avatarUrl = previewCanvasRef.current.toDataURL();
+      if (avatarMode === 'draw' && pixelCanvasRef.current) {
+        try {
+          // Only export from the drawing canvas, not the preview canvas
+          avatarUrl = pixelCanvasRef.current.toDataURL();
+        } catch (error) {
+          console.warn('Could not export custom drawing, using default:', error);
+          avatarUrl = ''; // Use empty string if drawing export fails
+        }
       }
 
       // Check if user already has a profile
