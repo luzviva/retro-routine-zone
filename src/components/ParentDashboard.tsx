@@ -37,24 +37,8 @@ export const ParentDashboard = ({ onLogout }: ParentDashboardProps) => {
 
   return (
     <div>
-      <header className="pixel-border p-4 mb-8 flex justify-between items-center">
+      <header className="pixel-border p-4 mb-8 text-center">
         <h1 className="text-3xl text-cyan-400">Painel dos Pais</h1>
-        <div className="flex gap-4">
-          <button 
-            onClick={() => navigate('/novoperfil')} 
-            className="pixel-btn text-green-400" 
-            style={{ borderColor: 'hsl(var(--pixel-green))', color: 'hsl(var(--pixel-green))' }}
-          >
-            Criar Perfil
-          </button>
-          <button 
-            onClick={onLogout} 
-            className="pixel-btn text-yellow-400" 
-            style={{ borderColor: 'hsl(var(--pixel-yellow))', color: 'hsl(var(--pixel-yellow))' }}
-          >
-            Sair
-          </button>
-        </div>
       </header>
 
       <main className="flex flex-col items-center space-y-6">
@@ -102,6 +86,24 @@ export const ParentDashboard = ({ onLogout }: ParentDashboardProps) => {
             <SpecialMissionCreationForm onSubmit={handleSpecialMissionSubmit} />
           </DialogContent>
         </Dialog>
+
+        {/* Botão Criar Perfil */}
+        <button 
+          onClick={() => navigate('/novoperfil')} 
+          className="pixel-btn text-red-400 w-64 text-xl py-4" 
+          style={{ borderColor: 'hsl(var(--pixel-red))', color: 'hsl(var(--pixel-red))' }}
+        >
+          Criar Perfil
+        </button>
+
+        {/* Botão Sair */}
+        <button 
+          onClick={onLogout} 
+          className="pixel-btn text-red-400 w-64 text-xl py-4" 
+          style={{ borderColor: 'hsl(var(--pixel-red))', color: 'hsl(var(--pixel-red))' }}
+        >
+          Sair
+        </button>
       </main>
     </div>
   );
