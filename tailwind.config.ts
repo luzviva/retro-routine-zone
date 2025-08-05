@@ -52,6 +52,20 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
+				// Pixel Gamer specific colors
+				pixel: {
+					bg: 'hsl(var(--pixel-bg))',
+					'bg-light': 'hsl(var(--pixel-bg-light))',
+					blue: 'hsl(var(--pixel-blue))',
+					red: 'hsl(var(--pixel-red))',
+					text: 'hsl(var(--pixel-text))',
+					cyan: 'hsl(var(--pixel-cyan))',
+					yellow: 'hsl(var(--pixel-yellow))',
+					green: 'hsl(var(--pixel-green))',
+					purple: 'hsl(var(--pixel-purple))',
+					gray: 'hsl(var(--pixel-gray))',
+					'gray-light': 'hsl(var(--pixel-gray-light))'
+				},
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
 					foreground: 'hsl(var(--sidebar-foreground))',
