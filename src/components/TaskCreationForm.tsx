@@ -141,22 +141,9 @@ export const TaskCreationForm = ({ onSubmit }: TaskCreationFormProps) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      // Get family ID
-      const { data: memberData } = await supabase
-        .from('family_members')
-        .select('family_id')
-        .eq('user_id', user.id)
-        .single();
-
-      if (!memberData) {
-        toast({
-          variant: "destructive",
-          title: "Erro",
-          description: "Família não encontrada",
-        });
-        setLoading(false);
-        return;
-      }
+      // Since we're using the simple approach, we'll use a default family_id
+      // or create one if needed. For now, let's use the user ID as family_id
+      const family_id = user.id;
 
       // Generate all task dates
       const taskDates = generateTaskDates(formData);
@@ -173,7 +160,7 @@ export const TaskCreationForm = ({ onSubmit }: TaskCreationFormProps) => {
 
       // Create tasks for each date
       const tasksToInsert = taskDates.map(date => ({
-        family_id: memberData.family_id,
+        family_id: family_id,
         assigned_to: formData.child,
         created_by: user.id,
         title: formData.title,
