@@ -51,11 +51,16 @@ export const TaskCreationForm = ({ onSubmit }: TaskCreationFormProps) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      // Get all children profiles directly
+      // Get children from the same family as the current user
       const { data: childrenData, error } = await supabase
         .from('profiles')
-        .select('user_id, display_name')
-        .eq('is_child', true);
+        .select(`
+          user_id, 
+          display_name,
+          family_members!inner(family_id, role)
+        `)
+        .eq('is_child', true)
+        .eq('family_members.role', 'child');
 
       if (error) {
         console.error('Erro ao buscar crianças:', error);
@@ -141,9 +146,23 @@ export const TaskCreationForm = ({ onSubmit }: TaskCreationFormProps) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      // Since we're using the simple approach, we'll use a default family_id
-      // or create one if needed. For now, let's use the user ID as family_id
-      const family_id = user.id;
+      // Get user's family ID
+      const { data: familyData, error: familyError } = await supabase
+        .from('family_members')
+        .select('family_id')
+        .eq('user_id', user.id)
+        .eq('role', 'parent')
+        .single();
+
+      if (familyError || !familyData) {
+        toast({
+          variant: "destructive",
+          title: "Erro",
+          description: "Usuário não é pai em nenhuma família",
+        });
+        setLoading(false);
+        return;
+      }
 
       // Generate all task dates
       const taskDates = generateTaskDates(formData);
@@ -158,9 +177,9 @@ export const TaskCreationForm = ({ onSubmit }: TaskCreationFormProps) => {
         return;
       }
 
-      // Create tasks for each date
+      // Create tasks for each date with proper family isolation
       const tasksToInsert = taskDates.map(date => ({
-        family_id: family_id,
+        family_id: familyData.family_id,
         assigned_to: formData.child,
         created_by: user.id,
         title: formData.title,

@@ -354,6 +354,16 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      create_child_profile: {
+        Args: {
+          child_name: string
+          child_gender?: string
+          child_birth_date?: string
+          child_favorite_color?: string
+          child_avatar_url?: string
+        }
+        Returns: string
+      }
       get_user_families: {
         Args: Record<PropertyKey, never>
         Returns: {

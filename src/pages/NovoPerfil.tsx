@@ -127,17 +127,6 @@ const NovoPerfil = () => {
     setLoading(true);
 
     try {
-      // Get current user
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        toast({
-          variant: "destructive",
-          title: "Usuário não encontrado",
-          description: "Por favor, faça login novamente",
-        });
-        return;
-      }
-
       // Get avatar URL - use drawing canvas only for custom drawings
       let avatarUrl = selectedAvatar;
       if (avatarMode === 'draw' && pixelCanvasRef.current) {
@@ -150,67 +139,17 @@ const NovoPerfil = () => {
         }
       }
 
-      // Check if user already has a profile
-      const { data: existingProfile } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('user_id', user.id)
-        .single();
+      // Use the new secure function to create child profile
+      const { data, error } = await supabase.rpc('create_child_profile', {
+        child_name: childName,
+        child_gender: childGender,
+        child_birth_date: childBirthdate,
+        child_favorite_color: favoriteColor,
+        child_avatar_url: avatarUrl
+      });
 
-      // Create or update profile with child data
-      const profileData = {
-        user_id: user.id,
-        display_name: childName,
-        birth_date: childBirthdate,
-        favorite_color: favoriteColor,
-        avatar_url: avatarUrl,
-        is_child: true,
-        current_level: 1,
-        total_experience: 0
-      };
-
-      const { error: profileError } = existingProfile
-        ? await supabase
-            .from('profiles')
-            .update(profileData)
-            .eq('user_id', user.id)
-        : await supabase
-            .from('profiles')
-            .insert(profileData);
-
-      if (profileError) {
-        throw profileError;
-      }
-
-      // Initialize child settings if not exists
-      const { error: settingsError } = await supabase
-        .from('child_settings')
-        .upsert({
-          user_id: user.id,
-          weekly_allowance: 10,
-          difficulty_level: 'normal',
-          rewards_enabled: true,
-          notifications_enabled: true
-        });
-
-      if (settingsError) {
-        throw settingsError;
-      }
-
-      // Initialize avatar customizations if not exists
-      const { error: avatarError } = await supabase
-        .from('avatar_customizations')
-        .upsert({
-          user_id: user.id,
-          hair_color: favoriteColor,
-          skin_tone: '#FDBCB4',
-          hair_style: 'default',
-          outfit: 'default',
-          background: 'default'
-        });
-
-      if (avatarError) {
-        throw avatarError;
+      if (error) {
+        throw error;
       }
 
       toast({
