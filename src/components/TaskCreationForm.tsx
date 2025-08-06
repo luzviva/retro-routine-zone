@@ -1,6 +1,4 @@
-import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
+import { useState } from "react";
 
 interface TaskFormData {
   title: string;
@@ -24,12 +22,12 @@ interface TaskCreationFormProps {
 
 export const TaskCreationForm = ({ onSubmit }: TaskCreationFormProps) => {
   const [formData, setFormData] = useState<TaskFormData>({
-    title: '',
-    description: '',
+    title: 'Escovar os dentes',
+    description: 'Lembre-se de escovar bem por 2 minutos.',
     reward: 5,
-    child: '',
+    child: 'Aventureiro',
     frequency: 'DIARIA',
-    dateStart: new Date().toISOString().split('T')[0],
+    dateStart: '',
     dateEnd: '',
     weekdays: ['mon', 'tue', 'wed', 'thu', 'fri'],
     timeStart: '08:00',
@@ -37,204 +35,6 @@ export const TaskCreationForm = ({ onSubmit }: TaskCreationFormProps) => {
     timeMode: 'start-end',
     duration: 10,
   });
-  
-  const [children, setChildren] = useState<Array<{id: string, name: string}>>([]);
-  const [loading, setLoading] = useState(false);
-  const { toast } = useToast();
-
-  useEffect(() => {
-    fetchFamilyChildren();
-  }, []);
-
-  const fetchFamilyChildren = async () => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      // Get children from the same family as the current user
-      const { data: childrenData, error } = await supabase
-        .from('profiles')
-        .select(`
-          user_id, 
-          display_name,
-          family_members!inner(family_id, role)
-        `)
-        .eq('is_child', true)
-        .eq('family_members.role', 'child');
-
-      if (error) {
-        console.error('Erro ao buscar crianças:', error);
-        return;
-      }
-
-      const childrenList = (childrenData || []).map(child => ({
-        id: child.user_id,
-        name: child.display_name || 'Sem nome'
-      }));
-
-      setChildren(childrenList);
-      
-      // Set first child as default
-      if (childrenList.length > 0) {
-        setFormData(prev => ({ ...prev, child: childrenList[0].id }));
-      }
-
-    } catch (error) {
-      console.error('Erro ao buscar dados da família:', error);
-    }
-  };
-
-  const generateTaskDates = (formData: TaskFormData): string[] => {
-    const dates: string[] = [];
-    
-    if (formData.frequency === 'UNICA') {
-      if (formData.specificDate) {
-        dates.push(formData.specificDate);
-      }
-    } else if (formData.frequency === 'DIARIA') {
-      const start = new Date(formData.dateStart || '');
-      const end = new Date(formData.dateEnd || formData.dateStart || '');
-      
-      for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
-        dates.push(d.toISOString().split('T')[0]);
-      }
-    } else if (formData.frequency === 'SEMANAL') {
-      const start = new Date(formData.dateStart || '');
-      const end = new Date(formData.dateEnd || formData.dateStart || '');
-      const weekdayNumbers = formData.weekdays?.map(day => {
-        const map: { [key: string]: number } = {
-          'sun': 0, 'mon': 1, 'tue': 2, 'wed': 3, 'thu': 4, 'fri': 5, 'sat': 6
-        };
-        return map[day];
-      }) || [];
-      
-      for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
-        if (weekdayNumbers.includes(d.getDay())) {
-          dates.push(d.toISOString().split('T')[0]);
-        }
-      }
-    }
-    
-    return dates;
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-
-    if (!formData.title.trim()) {
-      toast({
-        variant: "destructive",
-        title: "Erro",
-        description: "Título da tarefa é obrigatório",
-      });
-      setLoading(false);
-      return;
-    }
-
-    if (!formData.child) {
-      toast({
-        variant: "destructive",
-        title: "Erro",
-        description: "Selecione uma criança para a tarefa",
-      });
-      setLoading(false);
-      return;
-    }
-
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      // Get user's family ID
-      const { data: familyData, error: familyError } = await supabase
-        .from('family_members')
-        .select('family_id')
-        .eq('user_id', user.id)
-        .eq('role', 'parent')
-        .single();
-
-      if (familyError || !familyData) {
-        toast({
-          variant: "destructive",
-          title: "Erro",
-          description: "Usuário não é pai em nenhuma família",
-        });
-        setLoading(false);
-        return;
-      }
-
-      // Generate all task dates
-      const taskDates = generateTaskDates(formData);
-
-      if (taskDates.length === 0) {
-        toast({
-          variant: "destructive",
-          title: "Erro",
-          description: "Nenhuma data válida foi gerada para a tarefa",
-        });
-        setLoading(false);
-        return;
-      }
-
-      // Create tasks for each date with proper family isolation
-      const tasksToInsert = taskDates.map(date => ({
-        family_id: familyData.family_id,
-        assigned_to: formData.child,
-        created_by: user.id,
-        title: formData.title,
-        description: formData.description || null,
-        reward_coins: formData.reward,
-        task_date: date,
-      }));
-
-      const { error } = await supabase
-        .from('tasks')
-        .insert(tasksToInsert);
-
-      if (error) {
-        console.error('Erro ao criar tarefas:', error);
-        toast({
-          variant: "destructive",
-          title: "Erro ao criar tarefa",
-          description: error.message,
-        });
-      } else {
-        toast({
-          title: "Sucesso!",
-          description: `${taskDates.length} tarefa(s) criada(s) com sucesso`,
-        });
-        
-        // Reset form
-        setFormData({
-          title: '',
-          description: '',
-          reward: 5,
-          child: children[0]?.id || '',
-          frequency: 'DIARIA',
-          dateStart: new Date().toISOString().split('T')[0],
-          dateEnd: '',
-          weekdays: ['mon', 'tue', 'wed', 'thu', 'fri'],
-          timeStart: '08:00',
-          timeEnd: '08:10',
-          timeMode: 'start-end',
-          duration: 10,
-        });
-        
-        onSubmit(formData);
-      }
-
-    } catch (error) {
-      console.error('Erro ao criar tarefa:', error);
-      toast({
-        variant: "destructive",
-        title: "Erro",
-        description: "Ocorreu um erro inesperado",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const updateFrequencyFields = (frequency: string) => {
     setFormData(prev => ({ ...prev, frequency: frequency as any }));
@@ -247,6 +47,11 @@ export const TaskCreationForm = ({ onSubmit }: TaskCreationFormProps) => {
         ? prev.weekdays.filter(d => d !== day)
         : [...(prev.weekdays || []), day]
     }));
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSubmit(formData);
   };
 
   return (
@@ -290,17 +95,9 @@ export const TaskCreationForm = ({ onSubmit }: TaskCreationFormProps) => {
               className="nes-select"
               value={formData.child}
               onChange={(e) => setFormData(prev => ({ ...prev, child: e.target.value }))}
-              disabled={children.length === 0}
             >
-              {children.length === 0 ? (
-                <option value="">Nenhuma criança encontrada</option>
-              ) : (
-                children.map(child => (
-                  <option key={child.id} value={child.id}>
-                    {child.name}
-                  </option>
-                ))
-              )}
+              <option>Aventureiro</option>
+              <option>Exploradora</option>
             </select>
           </div>
         </div>
@@ -507,13 +304,8 @@ export const TaskCreationForm = ({ onSubmit }: TaskCreationFormProps) => {
         </div>
 
         <div className="pt-4">
-          <button 
-            type="submit" 
-            className="pixel-btn w-full text-green-400" 
-            style={{ borderColor: 'hsl(var(--pixel-green))', color: 'hsl(var(--pixel-green))' }}
-            disabled={loading}
-          >
-            {loading ? 'Criando...' : 'Salvar Tarefa'}
+          <button type="submit" className="pixel-btn w-full text-green-400" style={{ borderColor: 'hsl(var(--pixel-green))', color: 'hsl(var(--pixel-green))' }}>
+            Salvar Tarefa
           </button>
         </div>
       </form>

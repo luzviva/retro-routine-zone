@@ -1,5 +1,4 @@
-import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { useState } from "react";
 
 interface SpecialMissionFormData {
   title: string;
@@ -8,7 +7,6 @@ interface SpecialMissionFormData {
   coinsAmount?: number;
   storeItem?: string;
   textDescription?: string;
-  assignedTo: string;
 }
 
 interface SpecialMissionCreationFormProps {
@@ -21,47 +19,7 @@ export const SpecialMissionCreationForm = ({ onSubmit }: SpecialMissionCreationF
     executions: 5,
     prizeType: 'coins',
     coinsAmount: 25,
-    assignedTo: '',
   });
-
-  const [children, setChildren] = useState<Array<{id: string, name: string}>>([]);
-
-  useEffect(() => {
-    fetchFamilyChildren();
-  }, []);
-
-  const fetchFamilyChildren = async () => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      // Get all children profiles directly
-      const { data: childrenData, error } = await supabase
-        .from('profiles')
-        .select('user_id, display_name')
-        .eq('is_child', true);
-
-      if (error) {
-        console.error('Erro ao buscar crianças:', error);
-        return;
-      }
-
-      const childrenList = (childrenData || []).map(child => ({
-        id: child.user_id,
-        name: child.display_name || 'Sem nome'
-      }));
-
-      setChildren(childrenList);
-      
-      // Set first child as default
-      if (childrenList.length > 0) {
-        setFormData(prev => ({ ...prev, assignedTo: childrenList[0].id }));
-      }
-
-    } catch (error) {
-      console.error('Erro ao buscar dados da família:', error);
-    }
-  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -99,27 +57,6 @@ export const SpecialMissionCreationForm = ({ onSubmit }: SpecialMissionCreationF
               onChange={(e) => setFormData(prev => ({ ...prev, executions: parseInt(e.target.value) }))}
             />
           </div>
-        </div>
-
-        <div>
-          <label htmlFor="mission-child" className="text-lg block mb-1">Associar à Criança</label>
-          <select 
-            id="mission-child" 
-            className="nes-select"
-            value={formData.assignedTo}
-            onChange={(e) => setFormData(prev => ({ ...prev, assignedTo: e.target.value }))}
-            disabled={children.length === 0}
-          >
-            {children.length === 0 ? (
-              <option value="">Nenhuma criança encontrada</option>
-            ) : (
-              children.map(child => (
-                <option key={child.id} value={child.id}>
-                  {child.name}
-                </option>
-              ))
-            )}
-          </select>
         </div>
 
         <div>

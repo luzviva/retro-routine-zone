@@ -1,23 +1,13 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
 
 const NovoPerfil = () => {
   const navigate = useNavigate();
-  const { toast } = useToast();
   const [avatarMode, setAvatarMode] = useState<'predefined' | 'draw'>('predefined');
   const [selectedAvatar, setSelectedAvatar] = useState<string>('');
   const [selectedColor, setSelectedColor] = useState('#000000');
   const [pencilSize, setPencilSize] = useState(1);
   const [isDrawing, setIsDrawing] = useState(false);
-  const [loading, setLoading] = useState(false);
-  
-  // Form data
-  const [childName, setChildName] = useState('');
-  const [childGender, setChildGender] = useState('Menino');
-  const [childBirthdate, setChildBirthdate] = useState('');
-  const [favoriteColor, setFavoriteColor] = useState('#ff0000');
   
   const previewCanvasRef = useRef<HTMLCanvasElement>(null);
   const pixelCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -105,77 +95,8 @@ const NovoPerfil = () => {
     }
   };
 
-  const handleSaveProfile = async () => {
-    if (!childName.trim()) {
-      toast({
-        variant: "destructive",
-        title: "Nome obrigatório",
-        description: "Por favor, insira o nome da criança",
-      });
-      return;
-    }
-
-    if (!childBirthdate) {
-      toast({
-        variant: "destructive", 
-        title: "Data de nascimento obrigatória",
-        description: "Por favor, insira a data de nascimento",
-      });
-      return;
-    }
-
-    setLoading(true);
-
-    try {
-      // First, ensure user has a family
-      const { data: familyId, error: familyError } = await supabase.rpc('ensure_user_has_family');
-      
-      if (familyError) {
-        throw familyError;
-      }
-
-      // Get avatar URL - use drawing canvas only for custom drawings
-      let avatarUrl = selectedAvatar;
-      if (avatarMode === 'draw' && pixelCanvasRef.current) {
-        try {
-          // Only export from the drawing canvas, not the preview canvas
-          avatarUrl = pixelCanvasRef.current.toDataURL();
-        } catch (error) {
-          console.warn('Could not export custom drawing, using default:', error);
-          avatarUrl = ''; // Use empty string if drawing export fails
-        }
-      }
-
-      // Use the new secure function to create child profile
-      const { data, error } = await supabase.rpc('create_child_profile', {
-        child_name: childName,
-        child_gender: childGender,
-        child_birth_date: childBirthdate,
-        child_favorite_color: favoriteColor,
-        child_avatar_url: avatarUrl
-      });
-
-      if (error) {
-        throw error;
-      }
-
-      toast({
-        title: "Perfil criado com sucesso!",
-        description: "O perfil da criança foi salvo no sistema",
-      });
-
-      navigate('/settings');
-
-    } catch (error: any) {
-      console.error('Error saving profile:', error);
-      toast({
-        variant: "destructive",
-        title: "Erro ao salvar perfil",
-        description: error.message || "Ocorreu um erro inesperado",
-      });
-    } finally {
-      setLoading(false);
-    }
+  const handleSaveProfile = () => {
+    alert('Perfil Salvo!');
   };
 
   return (
@@ -205,9 +126,7 @@ const NovoPerfil = () => {
                     type="text" 
                     id="child-name" 
                     className="w-full bg-black/40 border-4 border-cyan-400 p-2 text-white text-lg focus:outline-none focus:border-yellow-400" 
-                    placeholder="Aventureiro"
-                    value={childName}
-                    onChange={(e) => setChildName(e.target.value)}
+                    placeholder="Aventureiro" 
                   />
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -216,8 +135,6 @@ const NovoPerfil = () => {
                     <select 
                       id="child-gender" 
                       className="w-full bg-black/40 border-4 border-cyan-400 p-2 text-white text-lg focus:outline-none focus:border-yellow-400 appearance-none"
-                      value={childGender}
-                      onChange={(e) => setChildGender(e.target.value)}
                       style={{
                         backgroundImage: `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="%2300ffff"><polygon points="0,0 20,0 10,10"/></svg>')`,
                         backgroundPosition: 'right 0.5rem center',
@@ -238,20 +155,8 @@ const NovoPerfil = () => {
                       id="child-birthdate" 
                       className="w-full bg-black/40 border-4 border-cyan-400 p-2 text-white text-lg focus:outline-none focus:border-yellow-400"
                       style={{ colorScheme: 'dark' }}
-                      value={childBirthdate}
-                      onChange={(e) => setChildBirthdate(e.target.value)}
                     />
                   </div>
-                </div>
-                <div>
-                  <label htmlFor="favorite-color" className="text-lg block mb-1">Cor Favorita</label>
-                  <input 
-                    type="color" 
-                    id="favorite-color" 
-                    className="w-full h-12 bg-black/40 border-4 border-cyan-400 p-1 cursor-pointer focus:outline-none focus:border-yellow-400"
-                    value={favoriteColor}
-                    onChange={(e) => setFavoriteColor(e.target.value)}
-                  />
                 </div>
               </form>
             </div>
@@ -396,9 +301,8 @@ const NovoPerfil = () => {
               className="pixel-btn w-full text-green-400"
               style={{ borderColor: 'hsl(var(--pixel-green))', color: 'hsl(var(--pixel-green))' }}
               onClick={handleSaveProfile}
-              disabled={loading}
             >
-              {loading ? 'Salvando...' : 'Salvar Perfil'}
+              Salvar Perfil
             </button>
           </div>
         </main>

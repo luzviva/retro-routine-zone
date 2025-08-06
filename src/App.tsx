@@ -7,7 +7,6 @@ import Index from "./pages/Index";
 import Settings from "./pages/Settings";
 import Shop from "./pages/Shop";
 import NovoPerfil from "./pages/NovoPerfil";
-import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -23,7 +22,6 @@ const App = () => (
           <Route path="/settings" element={<Settings />} />
           <Route path="/loja" element={<Shop />} />
           <Route path="/novoperfil" element={<NovoPerfil />} />
-          <Route path="/auth" element={<Auth />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

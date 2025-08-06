@@ -1,6 +1,4 @@
 import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
 
 interface PinScreenProps {
   onPinSuccess: (userType: 'child' | 'parent') => void;
@@ -9,43 +7,6 @@ interface PinScreenProps {
 export const PinScreen = ({ onPinSuccess }: PinScreenProps) => {
   const [currentPin, setCurrentPin] = useState('');
   const [error, setError] = useState('');
-  const [parentPin, setParentPin] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
-  const { toast } = useToast();
-
-  useEffect(() => {
-    // Buscar o PIN dos pais do usuário logado
-    const fetchUserPin = async () => {
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-        
-        if (user) {
-          const { data: profile, error } = await supabase
-            .from('profiles')
-            .select('parent_pin')
-            .eq('user_id', user.id)
-            .single();
-
-          if (error) {
-            console.error('Erro ao buscar PIN:', error);
-            toast({
-              variant: "destructive",
-              title: "Erro",
-              description: "Não foi possível carregar o PIN dos pais",
-            });
-          } else {
-            setParentPin(profile?.parent_pin || null);
-          }
-        }
-      } catch (error) {
-        console.error('Erro ao buscar usuário:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchUserPin();
-  }, [toast]);
 
   const enterPin = (digit: string) => {
     if (currentPin.length < 4) {
@@ -60,12 +21,12 @@ export const PinScreen = ({ onPinSuccess }: PinScreenProps) => {
   };
 
   const checkPin = () => {
-    // PIN para criança: 1234 (fixo)
+    // PIN para criança: 1234
+    // PIN para pais: 9999
     if (currentPin === '1234') {
       onPinSuccess('child');
       clearPin();
-    } else if (parentPin && currentPin === parentPin) {
-      // PIN para pais: usa o PIN criado durante o cadastro
+    } else if (currentPin === '9999') {
       onPinSuccess('parent');
       clearPin();
     } else {
@@ -73,17 +34,6 @@ export const PinScreen = ({ onPinSuccess }: PinScreenProps) => {
       clearPin();
     }
   };
-
-  if (loading) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen">
-        <div className="pixel-border p-8 text-center w-full max-w-sm">
-          <h1 className="text-4xl md:text-5xl text-yellow-400 mb-4">CARREGANDO...</h1>
-          <p className="text-xl">Aguarde um momento</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen">
