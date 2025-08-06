@@ -35,25 +35,11 @@ export const SpecialMissionCreationForm = ({ onSubmit }: SpecialMissionCreationF
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      // Get current user's family
-      const { data: memberData } = await supabase
-        .from('family_members')
-        .select('family_id')
-        .eq('user_id', user.id)
-        .eq('role', 'parent')
-        .single();
-
-      if (!memberData) return;
-
-      // Get all children in the family
+      // Get all children profiles directly
       const { data: childrenData, error } = await supabase
-        .from('family_members')
-        .select(`
-          user_id,
-          profiles(display_name)
-        `)
-        .eq('family_id', memberData.family_id)
-        .eq('role', 'child');
+        .from('profiles')
+        .select('user_id, display_name')
+        .eq('is_child', true);
 
       if (error) {
         console.error('Erro ao buscar crianças:', error);
@@ -62,7 +48,7 @@ export const SpecialMissionCreationForm = ({ onSubmit }: SpecialMissionCreationF
 
       const childrenList = (childrenData || []).map(child => ({
         id: child.user_id,
-        name: (child.profiles as any)?.display_name || 'Sem nome'
+        name: child.display_name || 'Sem nome'
       }));
 
       setChildren(childrenList);
