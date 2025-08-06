@@ -10,7 +10,7 @@ import { QuestCard } from "../components/QuestCard";
 import { WeekView } from "../components/WeekView";
 import { FeedbackModal } from "../components/FeedbackModal";
 import { SpecialMission } from "../components/SpecialMission";
-import { Settings, ShoppingCart } from "lucide-react";
+import { Settings, ShoppingCart, LogOut } from "lucide-react";
 
 interface Task {
   id: string;
@@ -265,6 +265,10 @@ const Home = () => {
     navigate('/loja');
   };
 
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+  };
+
   const formatDate = () => {
     const dayIndex = selectedDate.getDay();
     return `${dayNames[dayIndex]}, ${selectedDate.getDate()} de ${monthNames[selectedDate.getMonth()]} de ${selectedDate.getFullYear()}`;
@@ -318,6 +322,14 @@ const Home = () => {
               onClick={handleSettingsClick}
             >
               <Settings className="w-6 h-6" />
+            </PixelButton>
+            
+            <PixelButton 
+              className="text-sm p-2 flex items-center"
+              aria-label="Sair"
+              onClick={handleLogout}
+            >
+              <LogOut className="w-6 h-6" />
             </PixelButton>
           </div>
         </header>
