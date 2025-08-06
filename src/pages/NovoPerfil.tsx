@@ -127,6 +127,13 @@ const NovoPerfil = () => {
     setLoading(true);
 
     try {
+      // First, ensure user has a family
+      const { data: familyId, error: familyError } = await supabase.rpc('ensure_user_has_family');
+      
+      if (familyError) {
+        throw familyError;
+      }
+
       // Get avatar URL - use drawing canvas only for custom drawings
       let avatarUrl = selectedAvatar;
       if (avatarMode === 'draw' && pixelCanvasRef.current) {

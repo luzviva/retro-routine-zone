@@ -364,6 +364,10 @@ export type Database = {
         }
         Returns: string
       }
+      ensure_user_has_family: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
       get_user_families: {
         Args: Record<PropertyKey, never>
         Returns: {
